@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Official Letter Generator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap');
+  :root{
+    --army:#1c3320;--army2:#2a4d30;--gold:#b8922a;--gold2:#d4af5a;
+    --bg:#f0ede6;--white:#fff;--paper:#faf8f3;
+    --line:#d8d2c4;--muted:#7a7668;--ink:#1a1916;--red:#7a1f1f;--focus:#2a6040;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
+
+  /* TOP BAR */
+  .topbar{background:var(--army);display:flex;align-items:center;gap:14px;
+          padding:0 32px;height:56px;border-bottom:2px solid var(--gold);flex-shrink:0;}
+  .topbar-star{color:var(--gold);font-size:18px;}
+  .topbar-title{font-family:'EB Garamond',serif;color:#e8dfc8;font-size:19px;letter-spacing:.04em;}
+  .topbar-sep{flex:1;}
+  .topbar-badge{background:rgba(184,146,42,.2);border:1px solid var(--gold);color:var(--gold2);
+               font-size:10px;font-weight:600;letter-spacing:.12em;padding:3px 10px;border-radius:2px;}
+
+  /* LAYOUT */
+  .layout{display:grid;grid-template-columns:1fr 1fr;flex:1;max-width:1400px;width:100%;margin:0 auto;gap:0;}
+  @media(max-width:900px){.layout{grid-template-columns:1fr;}}
+
+  /* FORM CARD */
+  .form-card{background:var(--white);padding:32px 36px 24px;border-right:1px solid var(--line);}
+  @media(max-width:900px){.form-card{border-right:none;border-bottom:1px solid var(--line);}}
+
+  .sh{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+      color:var(--army2);margin:22px 0 10px;display:flex;align-items:center;gap:8px;}
+  .sh:first-child{margin-top:0;}
+  .sh::after{content:'';flex:1;height:1px;background:var(--line);}
+
+  .field{margin-bottom:11px;}
+  label{display:block;font-size:11px;font-weight:500;color:var(--muted);margin-bottom:4px;letter-spacing:.03em;}
+  input[type=text],textarea{
+    width:100%;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);
+    background:var(--paper);border:1px solid var(--line);border-radius:4px;
+    padding:8px 11px;outline:none;transition:border-color .18s,box-shadow .18s;}
+  input[type=text]:focus,textarea:focus{
+    border-color:var(--focus);box-shadow:0 0 0 3px rgba(42,96,64,.1);background:#fff;}
+  textarea{resize:vertical;min-height:130px;line-height:1.65;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  /* Classification chips */
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;}
+  .chip{padding:5px 13px;border:1.5px solid var(--line);border-radius:3px;font-size:11.5px;
+        font-weight:600;letter-spacing:.04em;cursor:pointer;color:var(--muted);
+        background:white;transition:all .14s;user-select:none;}
+  .chip:hover{border-color:var(--army2);color:var(--army);}
+  .chip.on{background:var(--army);border-color:var(--army);color:var(--gold2);}
+
+  .hint{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;}
+  .hint code{background:#f0ede6;padding:1px 5px;border-radius:2px;font-size:11px;color:var(--army2);}
+
+  /* Generate button */
+  .gen-btn{width:100%;margin-top:20px;padding:13px;background:var(--army);color:var(--gold2);
+           border:none;border-radius:5px;font-family:'EB Garamond',serif;font-size:17px;
+           font-weight:600;letter-spacing:.06em;cursor:pointer;
+           transition:background .18s,transform .1s,box-shadow .18s;
+           display:flex;align-items:center;justify-content:center;gap:10px;}
+  .gen-btn:hover{background:var(--army2);box-shadow:0 4px 18px rgba(28,51,32,.3);transform:translateY(-1px);}
+
+  /* PREVIEW CARD */
+  .preview-card{background:#e8e4db;padding:32px 36px;}
+  .preview-label{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+                 color:var(--muted);margin-bottom:14px;}
+
+  /* Paper sheet */
+  .paper{background:white;padding:44px 50px;font-family:'Times New Roman',Times,serif;
+         font-size:10.5px;color:#111;line-height:1.4;
+         box-shadow:0 4px 24px rgba(0,0,0,.14),0 1px 4px rgba(0,0,0,.07);}
+
+  /* Classification — centred */
+  .lc { text-align: center; font-weight: bold; text-decoration: underline;
+        font-size: 11px; letter-spacing: .06em; margin-bottom: 0; }
+
+  /* Monogram — right block: lines left-aligned, date right-aligned */
+  .lmono { margin-left: 48%; line-height: 1.4; margin-bottom: 10px; }
+  .lmono-line { text-align: left; }
+  .lmono-date { text-align: right; }
+
+  /* Address rows — 1.5 line spacing */
+  .la-row { display: flex; line-height: 1.65; }
+  .la-lbl { width: 44px; flex-shrink: 0; }
+  .la-val { flex: 1; }
+  .la-cont { padding-left: 44px; line-height: 1.65; }
+
+  /* Ref — 1.5 */
+  .lref { display: flex; line-height: 1.65; }
+
+  /* Subj */
+  .lsubj { display: flex; line-height: 1.65; }
+  .lsubj-val { font-weight: bold; text-decoration: underline; }
+
+  /* Body — 1.5 line spacing */
+  .lbody { line-height: 1.65; margin-top: 6px; }
+
+  /* Main para: number left, text indented, wrap UNDER text (not under number) */
+  .lbody .mp { display: flex; align-items: flex-start; }
+  .lbody .mp-num { min-width: 40px; flex-shrink: 0; }
+  .lbody .mp-txt { flex: 1; }
+
+  /* Sub point */
+  .lbody .sp { display: flex; align-items: flex-start; padding-left: 30px; }
+  .lbody .sp-num { min-width: 24px; flex-shrink: 0; }
+  .lbody .sp-txt { flex: 1; }
+
+  .lsig { text-align: right; margin-top: 28px; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-star">✦</span>
+  <span class="topbar-title">Official Letter Generator — FGEI Format</span>
+  <span class="topbar-sep"></span>
+  <span class="topbar-badge">RESTD / MILITARY CORRESPONDENCE</span>
+</div>
+
+<div class="layout">
+
+  <!-- ═══ FORM ═══ -->
+  <div class="form-card">
+    <form id="lform" action="/generate" method="POST">
+
+      <!-- Hidden field for classification -->
+      <input type="hidden" name="classification" id="cls_field" value="RESTD"/>
+
+      <div class="sh">Classification</div>
+      <div class="chips">
+        <button type="button" class="chip on" onclick="setClass(this,'RESTD')">RESTD</button>
+        <button type="button" class="chip" onclick="setClass(this,'CONFIDENTIAL')">CONFIDENTIAL</button>
+        <button type="button" class="chip" onclick="setClass(this,'SECRET')">SECRET</button>
+        <button type="button" class="chip" onclick="setClass(this,'UNCLASSIFIED')">UNCLASSIFIED</button>
+      </div>
+
+      <div class="sh">Monogram — Top Right Block</div>
+      <div class="field"><label>Line 1</label><input type="text" name="ml1" id="ml1" value="General Headquarter" oninput="rp()"/></div>
+      <div class="field"><label>Line 2</label><input type="text" name="ml2" id="ml2" value="IGT &amp; E Branch" oninput="rp()"/></div>
+      <div class="field"><label>Line 3</label><input type="text" name="ml3" id="ml3" value="FGEI (Cantts/Garrisons) Dte" oninput="rp()"/></div>
+      <div class="field"><label>Line 4</label><input type="text" name="ml4" id="ml4" value="Sir Syed Road, Rawalpindi" oninput="rp()"/></div>
+      <div class="field"><label>Line 5</label><input type="text" name="ml5" id="ml5" value="Telephone No. 5563198" oninput="rp()"/></div>
+      <div class="field"><label>Line 6 (File / Ref No.)</label><input type="text" name="ml6" id="ml6" value="No. 0409/6/77-FGEI (NTS)" oninput="rp()"/></div>
+      <div class="field"><label>Date</label><input type="text" name="date" id="mdate" value="10 Nov 2021" oninput="rp()"/></div>
+
+      <div class="sh">Addressee — Left Side</div>
+      <div class="field"><label>To: (Line 1)</label><input type="text" name="to1" id="to1" value="FGEI (C/G)" oninput="rp()"/></div>
+      <div class="field"><label>To: (Line 2 — optional)</label><input type="text" name="to2" id="to2" value="All Regional Office, ____________" oninput="rp()"/></div>
+      <div class="field"><label>To: (Line 3 — optional)</label><input type="text" name="to3" id="to3" value="" oninput="rp()"/></div>
+      <div class="field"><label>Info:</label><input type="text" name="info" id="finfo" value="Chairman, Regional Boards" oninput="rp()"/></div>
+      <div class="field"><label>ID:</label><input type="text" name="id" id="fid" value="All Wings" oninput="rp()"/></div>
+
+      <div class="sh">Reference &amp; Subject</div>
+      <div class="field">
+        <label>Ref: (leave blank if none)</label>
+        <input type="text" name="ref" id="fref" value="" oninput="rp()"/>
+      </div>
+      <div class="field">
+        <label>Subj: — will be Bold + Underlined</label>
+        <input type="text" name="subj" id="fsubj" value="Absent from Duty – Disposal" oninput="rp()"/>
+      </div>
+
+      <div class="sh">Body</div>
+      <div class="field">
+        <textarea name="body" id="fbody" rows="9" oninput="rp()">1.   It has been observed that Head of Institutions do not intimate the absence of staff well in time. Resultantly, indls remain absent from duty for a long time which create adm and procedural problems.
+2.   In order to take prompt action, fol procedure will be ensured for employees **BS-01 to 15**:-
+a.   Head of Institutions will initiate the case of those indls who remain absent from duty for more than **three (03) days** without any info, to concerned ROs with info to FGEI (C/G) Dte.
+b.   RO will issue **absence from duty notice** for resumption of duty through **UMS** at his/her **present and permanent home address** under intimation to this Dte.
+3.   All RDs to ensure implementation of time line for absentee cases.</textarea>
+        <div class="hint">Use <code>**word**</code> for <strong>bold</strong>. &nbsp;Main points: <code>1.</code> <code>2.</code> &nbsp;Sub-points: <code>a.</code> <code>b.</code></div>
+      </div>
+
+      <div class="sh">Signatory — Bottom Right</div>
+      <div class="two-col">
+        <div class="field"><label>Line 1</label><input type="text" name="s1" id="s1" value="sdxxxxxx" oninput="rp()"/></div>
+        <div class="field"><label>Line 2 (Rank)</label><input type="text" name="s2" id="s2" value="Lt Col" oninput="rp()"/></div>
+        <div class="field"><label>Line 3</label><input type="text" name="s3" id="s3" value="For DG" oninput="rp()"/></div>
+        <div class="field"><label>Line 4 (Name)</label><input type="text" name="s4" id="s4" value="(Ali Gohar)" oninput="rp()"/></div>
+      </div>
+
+      <button type="submit" class="gen-btn">⊞ &nbsp;GENERATE &amp; DOWNLOAD LETTER (.docx)</button>
+    </form>
+  </div>
+
+  <!-- ═══ PREVIEW ═══ -->
+  <div class="preview-card">
+    <div class="preview-label">Live Preview</div>
+    <div class="paper" id="paper"></div>
+  </div>
+
+</div><!-- /layout -->
+
+<script>
+let cls = 'RESTD';
+function setClass(btn, val){
+  document.querySelectorAll('.chip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  cls = val;
+  document.getElementById('cls_field').value = val;
+  rp();
+}
+
+const gi = id => document.getElementById(id).value.trim();
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function bold(t){return esc(t).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');}
+
+function rp(){
+  const mono = [gi('ml1'),gi('ml2'),gi('ml3'),gi('ml4'),gi('ml5'),gi('ml6')].filter(Boolean);
+  const date  = gi('mdate');
+  const to1   = gi('to1'), to2 = gi('to2');
+  const info  = gi('finfo'), id = gi('fid');
+  const ref   = gi('fref'), subj = gi('fsubj');
+  const body  = document.getElementById('fbody').value;
+  const sig   = [gi('s1'),gi('s2'),gi('s3'),gi('s4')].filter(Boolean);
+
+  // RESTD centred, monogram lines left-aligned, date right-aligned
+  const monoLinesHtml = mono.map(l => `<div class="lmono-line">${esc(l)}</div>`).join('');
+  const monoDateHtml  = date ? `<div class="lmono-date">${esc(date)}</div>` : '';
+
+  let addr = '';
+  if(to1){
+    addr += `<div class="la-row"><span class="la-lbl">To:</span><span class="la-val">${esc(to1)}</span></div>`;
+    if(to2) addr += `<div class="la-cont">${esc(to2)}</div>`;
+  }
+  if(info) addr += `<div class="la-row"><span class="la-lbl">Info:</span><span class="la-val">${esc(info)}</span></div>`;
+  if(id)   addr += `<div class="la-row"><span class="la-lbl">ID:</span><span class="la-val">${esc(id)}</span></div>`;
+
+  const refHtml = ref ? `<div class="lref"><span class="la-lbl">Ref:</span><span>${esc(ref)}</span></div>` : '';
+
+  let bodyHtml = '';
+  for(const raw of body.split('\n')){
+    const t = raw.trim();
+    if(!t){bodyHtml+='<div style="height:5px"></div>';continue;}
+    const sub  = t.match(/^([a-z])\.\s+(.*)/);
+    const main = t.match(/^(\d+)\.\s+(.*)/);
+    if(sub)
+      bodyHtml += `<div class="sp"><span class="sp-num">${esc(sub[1])}.</span><span class="sp-txt">${bold(sub[2])}</span></div>`;
+    else if(main)
+      // mp-num is fixed width, mp-txt wraps under itself (not under number)
+      bodyHtml += `<div class="mp"><span class="mp-num">${esc(main[1])}.</span><span class="mp-txt">${bold(main[2])}</span></div>`;
+    else
+      bodyHtml += `<div>${bold(t)}</div>`;
+  }
+
+  const sigHtml = sig.map(l=>`<div>${esc(l)}</div>`).join('');
+
+  document.getElementById('paper').innerHTML = `
+    <div class="lc">${esc(cls)}</div>
+    <div class="lmono">${monoLinesHtml}${monoDateHtml}</div>
+    ${addr}${refHtml}
+    <div class="lsubj"><span class="la-lbl">Subj:</span><span class="lsubj-val">${esc(subj)}</span></div>
+    <div class="lbody">${bodyHtml}</div>
+    <div class="lsig">${sigHtml}</div>
+  `;
+}
+rp();
+</script>
+</body>
+</html>
