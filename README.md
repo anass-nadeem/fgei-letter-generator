@@ -19,6 +19,9 @@ A web-based letter generation system where staff enter data into a structured fo
 <img width="916" height="481" alt="123" src="https://github.com/user-attachments/assets/3db3a4ee-2940-4088-b788-a070246fb11a" />
 <img width="271" height="340" alt="234" src="https://github.com/user-attachments/assets/b7cd89ec-d3f0-4d95-bd6a-9595f357f173" />
 
+## Live Demo
+
+https://letter-generator-4gr7.onrender.com/
 
 ## Key Features
 
