@@ -40,7 +40,7 @@ https://letter-generator-4gr7.onrender.com/
 | Backend | Python, Flask |
 | Document Engine | python-docx, lxml |
 | Frontend | HTML5, CSS3, Vanilla JS |
-| Deployment | PyInstaller (desktop), Railway (web) |
+| Deployment | PyInstaller (desktop), Render (web) |
 
 ## Technical Highlights
 
